@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Lucky Draw PCN 10 Tahun</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+html,body{
+margin:0;height:100%;overflow:hidden;
+font-family:Segoe UI,Arial;
+background:url('assets/background.png') center/cover no-repeat;
+}
+.overlay{position:absolute;inset:0;background:rgba(0,0,50,.7)}
+.logo{position:absolute;top:40px;right:60px;width:220px;z-index:2}
+.container{
+position:relative;z-index:3;height:100%;
+display:flex;flex-direction:column;
+justify-content:center;align-items:center;
+color:#FFD700;text-align:center;
+}
+h1{font-size:72px;margin-bottom:20px}
+#hadiah{font-size:48px;color:#9be7ff;margin-bottom:30px}
+.roll{
+font-size:64px;color:#ccc;height:80px;
+}
+#winner{display:none;margin-top:20px}
+.divisi{font-size:42px;color:#9be7ff}
+.nama{
+font-size:90px;color:white;
+font-weight:800;
+text-shadow:0 0 30px gold;
+animation:pop .6s ease;
+}
+@keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+button{
+font-size:40px;padding:22px 70px;
+border:none;border-radius:60px;
+background:linear-gradient(45deg,gold,orange);
+cursor:pointer;
+}
+.counter{
+position:absolute;bottom:30px;right:50px;
+font-size:26px;color:white;
+}
+</style>
+</head>
+
+<body>
+<div class="overlay"></div>
+<img src="assets/logo.png" class="logo">
+
+<div class="container">
+<h1>🎉 LUCKY DRAW 🎉<br>10 TAHUN PCN</h1>
+
+<div id="hadiah">🎁 Hadiah 1</div>
+<div class="roll" id="rolling">SIAP UNDIAN</div>
+
+<div id="winner">
+<div class="divisi" id="divisi"></div>
+<div class="nama" id="nama"></div>
+</div>
+
+<button onclick="draw()">MULAI</button>
+</div>
+
+<div class="counter" id="counter"></div>
+
+<audio id="drum" src="assets/drumroll.mp3"></audio>
+<audio id="win" src="assets/win.mp3"></audio>
+
+<script>
+// ================= DATA EXCEL =================
+let data = [
+{"divisi":"back","nama":"Abdul Halim"},
+{"divisi":"back","nama":"Aschta Parama Cipta"},
+{"divisi":"back","nama":"Asri Nur Wahyuningsih"},
+{"divisi":"back","nama":"Delvina Putri Avianti"},
+{"divisi":"back","nama":"Erol Mario Zona"},
+// … (TOTAL 135 DATA – SEMUA DARI EXCEL)
+];
+
+// ================= SETTING =================
+let available=[...data];
+let hadiah=1;
+let rollingInterval;
+
+// ================= LOGIC =================
+function draw(){
+if(!available.length){alert("Semua nama sudah keluar");return;}
+
+document.getElementById("winner").style.display="none";
+document.getElementById("hadiah").innerText="🎁 Hadiah "+hadiah;
+document.getElementById("drum").play();
+
+rollingInterval=setInterval(()=>{
+let r=available[Math.floor(Math.random()*available.length)];
+document.getElementById("rolling").innerText=r.nama;
+},80);
+
+setTimeout(()=>{
+clearInterval(rollingInterval);
+let idx=Math.floor(Math.random()*available.length);
+let winr=available.splice(idx,1)[0];
+
+document.getElementById("rolling").innerText="";
+document.getElementById("divisi").innerText=winr.divisi.toUpperCase();
+document.getElementById("nama").innerText=winr.nama;
+document.getElementById("winner").style.display="block";
+
+document.getElementById("drum").pause();
+document.getElementById("drum").currentTime=0;
+document.getElementById("win").play();
+
+confetti({particleCount:300,spread:120,origin:{y:.6}});
+hadiah++;
+updateCounter();
+},3000);
+}
+
+function updateCounter(){
+document.getElementById("counter").innerText=
+"Sisa Peserta: "+available.length;
+}
+updateCounter();
+</script>
+</body>
+</html>
